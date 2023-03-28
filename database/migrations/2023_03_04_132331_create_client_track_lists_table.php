@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('client_track_lists', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('track_code', 50)->nullable();
             $table->string('detail', 50)->nullable();
             $table->string('status', 50)->nullable();
