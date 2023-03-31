@@ -53,7 +53,7 @@ class DashboardController extends Controller
             $users = User::query()->select('id', 'name', 'surname', 'type', 'login', 'city', 'is_active', 'block', 'password', 'created_at')->where('type', null)->where('is_active', false)->get();
             return view('admin')->with(compact('users', 'messages', 'search_phrase', 'config'));
         }
-        $config = Configuration::query()->select('whats_app')->first();
+        $config = Configuration::query()->select('whats_app', 'title_text', 'address_two')->first();
         return view('register-me')->with(compact( 'config'));
     }
 
