@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\City;
 use App\Models\ClientTrackList;
 use App\Models\Configuration;
 use App\Models\Message;
@@ -20,7 +21,7 @@ class DashboardController extends Controller
             $tracks = ClientTrackList::query()
                 ->leftJoin('track_lists', 'client_track_lists.track_code', '=', 'track_lists.track_code')
                 ->select( 'client_track_lists.track_code', 'client_track_lists.detail', 'client_track_lists.created_at',
-                    'track_lists.to_china','track_lists.to_almaty','client_track_lists.id','track_lists.to_client','track_lists.client_accept','track_lists.status')
+                    'track_lists.to_china','track_lists.to_almaty','client_track_lists.id','track_lists.to_client','track_lists.client_accept','track_lists.status','track_lists.city')
                 ->where('client_track_lists.user_id', Auth::user()->id)
                 ->where('client_track_lists.status',null)
                 ->orderByDesc('client_track_lists.id')
@@ -43,15 +44,17 @@ class DashboardController extends Controller
             return view('almaty')->with(compact('count', 'config', 'qr'));
         }elseif (Auth::user()->is_active === 1 && Auth::user()->type === 'almatyout'){
             $config = Configuration::query()->select('address', 'title_text', 'address_two')->first();
+            $cities = City::query()->select('title')->get();
             $qr = QrCodes::query()->select()->where('id', 1)->first();
             $count = TrackList::query()->whereDate('to_client', Carbon::today())->count();
-            return view('almatyout')->with(compact('count', 'config', 'qr'));
+            return view('almatyout')->with(compact('count', 'config', 'qr', 'cities'));
         }elseif (Auth::user()->is_active === 1 && Auth::user()->type === 'othercity'){
             $config = Configuration::query()->select('address', 'title_text', 'address_two')->first();
             $qr = QrCodes::query()->select()->where('id', 1)->first();
+            $cities = City::query()->select('title')->get();
             $count = TrackList::query()->whereDate('to_client', Carbon::today())->count();
-            return view('othercity')->with(compact('count', 'config', 'qr'));
-        }elseif (Auth::user()->is_active === 1 && Auth::user()->type === 'admin'){
+            return view('othercity')->with(compact('count', 'config', 'qr', 'cities'));
+        }elseif (Auth::user()->is_active === 1 && Auth::user()->type === 'admin' || Auth::user()->is_active === 1 && Auth::user()->type === 'moderator'){
             $messages = Message::all();
             $config = Configuration::query()->select('address', 'title_text', 'address_two')->first();
             $search_phrase = '';
